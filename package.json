@@ -1,0 +1,15 @@
+{
+  "name": "toddle",
+  "version": "1.0.0",
+  "description": "REST API endpoints for a Class Files app",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
