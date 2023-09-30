@@ -1,4 +1,4 @@
-const sequelize = require('./db');
+const sequelize = require('./connection');
 
 global.executePromisified = function (statement, parameters, transaction) {
     return new Promise(async function (resolve, reject) {
@@ -21,3 +21,4 @@ global.executePromisified = function (statement, parameters, transaction) {
     });
 };
 
+module.exports

@@ -1,4 +1,4 @@
-import CommonService from "./Common"
+const CommonService = require('./Common')
 
 class Tutor{
     constructor(id, name){
@@ -8,8 +8,9 @@ class Tutor{
 
     addClass = async(name, description, classCode)=>{
         try{
-            await executePromisified(`insert into classes (name, description, classCode, createdBy) values(${name}, ${description}, ${classCode}, ${this.id})`)
-            return true
+            await executePromisified(`insert into classes (name, description, classCode, createdBy) values("${name}", "${description}", "${classCode}", ${this.id})
+                                        on duplicate key update active = 1, description = ${description}, name = ${name}`)
+            return "Successfully Added."
         }catch(e){
             console.log(e)
         }
@@ -17,51 +18,62 @@ class Tutor{
 
     removeClass = async(classCode)=>{
         try{
-            await executePromisified(`update classes set active = 0 where classCode = ${classCode}`)
-            return true
+            await executePromisified(`update classes set active = 0 where classCode = "${classCode}"`)
+            // removing student from class as well
+            await executePromisified(`update student_classes set active = 0 where classCode = "${classCode}"`)
+            return "Class Removed"
         }catch(e){
             console.log(e)
+            return "Error"
         }
     }
     
     addStudents = async(students, classCode)=>{
         try{
-            let exist = await executePromisified(`select id from users where id in (${students})`)
-            for(let student of exist){
-                let res = await executePromisified(`insert into student_classes (studentId, classCode) values(${student}, ${classCode})
-                                                    on duplicate key update active = 1)`)
-                if(exist) res[student] = `Enrolled in ${classCode}`
+            for(let student of students){
+                try{
+                    await executePromisified(`insert into student_classes (studentId, classCode) values(${student.id}, "${classCode}")
+                                                    on duplicate key update active = 1`)
+                    res[student.id] = `Enrolled in ${classCode}`
+                }catch(e){
+                    res[student.id] = "Wrong student Id or Wrong classCode"
+                }  
             }
+            return res
         }catch(e){
             console.log(e)
+            return "Wrong student Id or Wrong classCode"
         }
     }
 
     removeStudent = async(student, classCode)=>{
         try{
-            await executePromisified(`update student_classes set active = 0 where classCode = ${classCode} and studentId = ${student}`)
-            return true
+            await executePromisified(`update student_classes set active = 0 where classCode = "${classCode}" and studentId = ${student}`)
+            return "Successfully removed"
         }catch(e){
             console.log(e)
+            return "Please provide right student ID and classCode."
         }
     }
 
-    addFile = async(name, description, classCode, file = null,  fileType)=>{
+    addFile = async(name, description, classCode, fileType, file = null)=>{
         try{
-            await executePromisified(`insert into files (name, description, classCode, file, fileType, uploadedBy) values(${name}, ${description}, ${classCode}, ${file}, ${fileType})`)
-            return true
+            await executePromisified(`insert into files (name, description, classCode, file, fileType, uploadedBy) values("${name}", "${description}", "${classCode}", ${file}, ${fileType}, ${this.id})`)
+            return "Successfully Added"
         }catch(e){
             console.log(e)
+            return "Invalid data."
         }
 
     }
 
     viewClasses = async()=>{
         try{
-            let classes = await executePromisified(`select name, classCode from classes where createdBy = ${this.id}`)
+            let classes = await executePromisified(`select name, classCode from classes where createdBy = ${this.id} and active = 1`)
             return classes
         }catch(e){
             console.log(e)
+            return "Error"
         }
     }
 
@@ -71,9 +83,10 @@ class Tutor{
             return files
         }catch(e){
             console.log(e)
+            return "Error"
         }
     }
 
 }
 
-export default Tutor;
+module.exports = Tutor;

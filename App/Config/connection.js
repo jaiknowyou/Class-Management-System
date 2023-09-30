@@ -1,6 +1,5 @@
 const {Sequelize} = require('sequelize')
 require('./config')
-require('./connection')
 
 // DB Config initialisation
 const sequelize = new Sequelize(DATABASE, USERNAME, PASSWORD,{
@@ -24,5 +23,3 @@ sequelize.afterDisconnect((callback) => {
 });
 
 module.exports = sequelize
-
-// CREATE TABLE `bytespeedtestdb`.`Contact` (`id` SERIAL NOT NULL , `phoneNumber` VARCHAR(32) NULL , `email` VARCHAR(32) NULL , `linkedId` INT NULL , `linkPrecedence` ENUM('primary','secondary') NOT NULL , `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , `updatedAt` DATETIME on update CURRENT_TIMESTAMP NULL , `deletedAt` DATETIME NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;

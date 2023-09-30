@@ -2,6 +2,8 @@ var express = require('express')
 var app = express()
 const routes = require('./App/Routes/routes')
 
+require('./App/Config/db')
+
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 })

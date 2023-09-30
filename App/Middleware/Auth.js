@@ -4,7 +4,11 @@ const CommonService = require('../Models/Common')
 let AuthController = {}
 
 AuthController.generateJWT = async(req, res)=>{
+    try{
 
+    }catch(e){
+        console.log(e)
+    }
 }
 
 AuthController.verify = async(req, res, next)=>{
@@ -17,10 +21,7 @@ AuthController.verify = async(req, res, next)=>{
 
 AuthController.user = (type)=> async(req, res, next)=>{
     try{
-        if(req.params.userId[0] != type) {
-            res.send("Invalid UserId.")
-        }
-        req.user = await CommonService.getUser(req.params.userId, type)
+        req.user = await CommonService.getUser(parseInt(req.params.userId), type)
         next()
     }catch(e){
         console.log(e)
@@ -28,4 +29,4 @@ AuthController.user = (type)=> async(req, res, next)=>{
     }
 }
 
-export default AuthController
+module.exports = AuthController

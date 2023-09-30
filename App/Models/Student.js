@@ -1,4 +1,4 @@
-import CommonService from "./Common"
+let CommonService = require('./Common')
 
 class Student{
     constructor(id, name){
@@ -14,7 +14,8 @@ class Student{
             let classes = await executePromisified(query)
             return classes
         }catch(e){
-            console.log(e)   
+            console.log(e)
+            return "Error"
         } 
     }
 
@@ -24,8 +25,9 @@ class Student{
             return files
         }catch(e){
             console.log(e)
+            return "Error"
         }
     }
 }
 
-export default Student;
+module.exports = Student;

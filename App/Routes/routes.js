@@ -1,7 +1,10 @@
 const { Router } = require("express")
 const AuthController = require('../Middleware/Auth')
-const { default: TutorController } = require("../Controllers/TutorController")
-const { default: StudentController } = require("../Controllers/StudentController")
+const TutorController = require("../Controllers/TutorController")
+const StudentController= require("../Controllers/StudentController")
+
+// require('../Config/db')
+
 
 let router = Router()
 // Middleware later ----> Auth.verify()
@@ -16,3 +19,5 @@ router.put('/:userId/tutor/removeClass', AuthController.verify, AuthController.u
 
 router.get('/:userId/viewClasses', AuthController.verify, AuthController.user('student'), StudentController.viewClasses)
 router.get('/:userId/viewFiles', AuthController.verify, AuthController.user('student'), StudentController.viewFiles)
+
+module.exports = router

@@ -1,5 +1,4 @@
 
-
 let StudentController = {}
 
 StudentController.viewClasses = async(req, res)=>{
@@ -8,16 +7,18 @@ StudentController.viewClasses = async(req, res)=>{
         res.send(classes)
     }catch(e){
         console.log(e)
+        res.send("Request Failed.")
     }
 }
 
 StudentController.viewFiles = async(req, res)=>{
     try{
-        let files = await req.user.viewFiles(req.body.classCode)
+        let files = await req.user.viewFiles(req.body.classCode, req.body.filter)
         res.send(files)
     }catch(e){
         console.log(e)
+        res.send("Request Failed.")
     }
 }
 
-export default StudentController
+module.exports = StudentController
