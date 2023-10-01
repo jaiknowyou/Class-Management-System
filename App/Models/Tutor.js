@@ -1,4 +1,5 @@
 let CommonService = require('./Common')
+require('dotenv')
 
 class Tutor{
     constructor(id, name){
@@ -74,6 +75,12 @@ class Tutor{
 
     addFile = async(name, description, classCode, fileType, file = null)=>{
         try{
+            let result
+            if(file) result = await CommonService.uploadToS3({name, classCode, file})
+            if(result) {
+                console.log(result)
+                file = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${classCode+name}`
+            }
             await executePromisified(`insert into files (name, description, classCode, file, fileType, uploadedBy) values("${name}", "${description}", "${classCode}", ${file}, ${fileType}, ${this.id})`)
             return "Successfully Added"
         }catch(e){

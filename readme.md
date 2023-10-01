@@ -23,6 +23,10 @@ Student API Calls
 1. View Classes
 2. View Files
 
+Common API Calls
+1. Add User
+2. Get User by Type
+
 Step 1: NodeJS Architecture = Day 1
 Step 2: MySQL Table Creation
 Step 3: Corrections and Debugging

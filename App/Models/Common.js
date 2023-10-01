@@ -1,9 +1,24 @@
 let CommonService = {}
 
+require('dotenv')
+const S3 = require('aws-sdk/clients/s3')
+const fs = require('fs')
+
+const bucketName = process.env.AWS_BUCKET_NAME
+const region = process.env.AWS_BUCKET_REGION
+const accessKeyId = process.env.AWS_ACCESS_KEY
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+
+const s3 = new S3({
+    region,
+    accessKeyId,
+    secretAccessKey,
+})
+
 CommonService.addUser = async(req, res)=>{
     try{
         let name = req.body.name
-        if(typeof name != 'string' || name == '') res.send(`Missing Parameter ---> name`)
+        if(typeof name != 'string' || name == '') return res.send(`Missing Parameter ---> name`)
         let type
         switch (req.body.type){
             case 'teacher':
@@ -13,13 +28,13 @@ CommonService.addUser = async(req, res)=>{
                 type = 2
                 break
             default:
-                res.send("Invalid User type")
+                return res.send("Invalid User type")
         }
         await executePromisified(`insert into Users (name, type) values('${name}', ${type})`)
-        res.send("Successfully Added.")
+        return res.send("Successfully Added.")
     }catch(e){
         console.log(e)
-        res.send("Error.")
+        return res.send("Error.")
     }
 }
 
@@ -34,10 +49,10 @@ CommonService.getUserByType = async(req, res)=>{
                 type = 2
                 break
             default:
-                res.send("Invalid User type")
+                return res.send("Invalid User type")
         }
         let result = await executePromisified(`select id, name from Users where type = ${type}`)
-        res.send(result)
+        return res.send(result)
     }catch(e){
         console.log(e)
         return res.send("error")
@@ -74,6 +89,23 @@ CommonService.viewFiles = async(classCode, filter)=>{
         }catch(e){
             console.log(e)
             reject()
+        }
+    })
+}
+
+CommonService.uploadToS3 = async(file)=>{
+    return new Promise((resolve, reject)=>{
+        try{
+            let fileStream = fs.createReadStream(file.file)
+            return s3.upload({
+                Bucket: bucketName,
+                Body: fileStream,
+                Key: `${file.classCode+file.name}`,
+                ACL: 'public-read'
+            }).promise()
+        }catch(e){
+            console.log(e)
+            reject(e)
         }
     })
 }

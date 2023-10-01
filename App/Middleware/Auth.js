@@ -9,7 +9,7 @@ let AuthController = {}
 AuthController.generateJWT = async(req, res)=>{
     try{
         let commonCheck = CommonService.commonCheck(req, ["username", "password"], 'body')
-        if(commonCheck) res.send(`Missing Parameter ---> ${commonCheck}`)
+        if(commonCheck) return res.send(`Missing Parameter ---> ${commonCheck}`)
         // Arbitrary username and password ---> no check
         return res.send(jwt.sign(req.body.username, PRIVATE_KEY))
     }catch(e){
@@ -20,7 +20,7 @@ AuthController.generateJWT = async(req, res)=>{
 AuthController.verify = async(req, res, next)=>{
     try{
         let verify = jwt.verify(req.headers.token, PRIVATE_KEY)
-        if(!verify) res.send("Invalid or Expired Token.")
+        if(!verify) return res.send("Invalid or Expired Token.")
         next()
     }catch(e){
         console.log(e)
@@ -38,7 +38,7 @@ AuthController.user = (userType)=> async(req, res, next)=>{
         next()
     }catch(e){
         console.log(e)
-        res.send("Invalid UserId.")
+        return res.send("Invalid UserId.")
     }
 }
 
