@@ -1,5 +1,5 @@
 
-create table users(
+create table Users(
     id int not null auto_increment,
     name varchar(25),
     type enum('teacher', 'student'),

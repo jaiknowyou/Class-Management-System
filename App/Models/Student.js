@@ -8,7 +8,7 @@ class Student{
 
     viewClasses = async()=>{
         try{
-            let query = `select name, classCode from classes c
+            let query = `select name, c.classCode from classes c
                         right join student_classes sc on sc.studentId = ${this.id} and sc.classCode = c.classCode and sc.active = 1
                         where c.active = 1`
             let classes = await executePromisified(query)

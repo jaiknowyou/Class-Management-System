@@ -1,4 +1,4 @@
-const CommonService = require('./Common')
+let CommonService = require('./Common')
 
 class Tutor{
     constructor(id, name){
@@ -8,6 +8,7 @@ class Tutor{
 
     addClass = async(name, description, classCode)=>{
         try{
+            // If class info (classCode) was already in DB, It's updated, else new entry is created.
             await executePromisified(`insert into classes (name, description, classCode, createdBy) values("${name}", "${description}", "${classCode}", ${this.id})
                                         on duplicate key update active = 1, description = ${description}, name = ${name}`)
             return "Successfully Added."
@@ -16,9 +17,24 @@ class Tutor{
         }
     }
 
+    updateClass = async(update)=>{
+        try{
+            let set = `set `
+            if(update.name) set += `name = ${update.name} `
+            if(update.description) set += `description = ${update.description} `
+            if(update.classCode) set += `classCode = ${update.classCode}`
+            await executePromisified(`update classes ${set} where classCode = "${classCode}"`)
+            return "Successfully Updated."
+        }catch(e){
+            console.log(e)
+            return "Error"
+        }
+    }
+
     removeClass = async(classCode)=>{
         try{
             await executePromisified(`update classes set active = 0 where classCode = "${classCode}"`)
+            // Class is removed, Students enrolled with the class need to be removed. 
             // removing student from class as well
             await executePromisified(`update student_classes set active = 0 where classCode = "${classCode}"`)
             return "Class Removed"

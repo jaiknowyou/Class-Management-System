@@ -4,18 +4,31 @@ let TutorController = {}
 
 
 TutorController.addClass= async(req, res)=>{
-    // CommonService.commonCheck();
     try{
+        let commonCheck = CommonService.commonCheck(req, ["name", "description", "classCode"])
+        if(commonCheck) res.send(`Missing Parameter ---> ${commonCheck}`)
         let added = await req.user.addClass(req.body.name, req.body.description, req.body.classCode)
         res.send(added)
     }catch(e){
         console.log(e)
-        res.send("Error: Check if description is not too long.")
+        res.send("Error: Check if description is too long.")
+    }    
+}
+
+TutorController.updateClass= async(req, res)=>{
+    try{
+        let updated = await req.user.updateClass(req.body)
+        res.send(updated)
+    }catch(e){
+        console.log(e)
+        res.send("Error.")
     }    
 }
 
 TutorController.addStudents = async(req, res)=>{
     try{
+        let commonCheck = CommonService.commonCheck(req, ["students", "classCode"])
+        if(commonCheck) res.send(`Missing Parameter ---> ${commonCheck}`)
         let result = await req.user.addStudents(req.body.students, req.body.classCode)
         res.send(result)
     }catch(e){
@@ -26,6 +39,8 @@ TutorController.addStudents = async(req, res)=>{
 
 TutorController.addFile = async(req, res)=>{
     try{
+        let commonCheck = CommonService.commonCheck(req, ["name", "description", "classCode", "fileType"])
+        if(commonCheck) res.send(`Missing Parameter ---> ${commonCheck}`)
         let fileType = req.body.fileType.toLowerCase()
         switch (fileType){
             case 'audio':
@@ -63,7 +78,7 @@ TutorController.viewClasses = async(req, res)=>{
 
 TutorController.viewFiles = async(req, res)=>{
     try{
-        let files = await req.user.viewFiles(req.body.classCode, req.body.filter)
+        let files = await req.user.viewFiles(req.params.classCode, req.query)
         res.send(files)
     }catch(e){
         console.log(e)
@@ -73,6 +88,8 @@ TutorController.viewFiles = async(req, res)=>{
 
 TutorController.removeStudent = async(req, res)=>{
     try{
+        let commonCheck = CommonService.commonCheck(req, ["studentId", "classCode"])
+        if(commonCheck) res.send(`Missing Parameter ---> ${commonCheck}`)
         let result = await req.user.removeStudent(req.body.studentId, req.body.classCode)
         res.send(result)
     }catch(e){
@@ -83,6 +100,8 @@ TutorController.removeStudent = async(req, res)=>{
 
 TutorController.removeClass = async(req, res)=>{
     try{
+        let commonCheck = CommonService.commonCheck(req, ["classCode"])
+        if(commonCheck) res.send(`Missing Parameter ---> ${commonCheck}`)
         let result  = await req.user.removeClass(req.body.classCode)
         res.send(result)
     }catch(e){
