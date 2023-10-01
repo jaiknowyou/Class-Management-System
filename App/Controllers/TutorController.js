@@ -11,7 +11,7 @@ TutorController.addClass= async(req, res)=>{
         return res.send(added)
     }catch(e){
         console.log(e)
-        return res.send("Error: Check if description is too long.")
+        return res.status(400).send("Error: Check if description is too long.")
     }    
 }
 
@@ -21,7 +21,7 @@ TutorController.updateClass= async(req, res)=>{
         return res.send(updated)
     }catch(e){
         console.log(e)
-        return res.send("Error.")
+        return res.status(400).send("Error.")
     }    
 }
 
@@ -33,7 +33,7 @@ TutorController.addStudents = async(req, res)=>{
         return res.send(result)
     }catch(e){
         console.log(e)
-        return res.send("Error")
+        return res.status(400).send("Error")
     }
 }
 
@@ -62,7 +62,7 @@ TutorController.addFile = async(req, res)=>{
         return res.send("Successfully Added.")
     }catch(e){
         console.log(e)
-        return res.send("Error")
+        return res.status(400).send("Error")
     }
 }
 
@@ -72,7 +72,7 @@ TutorController.viewClasses = async(req, res)=>{
         return res.send(classes)
     }catch(e){
         console.log(e)
-        return res.send("Error")
+        return res.status(400).send("Error")
     }
 }
 
@@ -82,7 +82,7 @@ TutorController.viewFiles = async(req, res)=>{
         return res.send(files)
     }catch(e){
         console.log(e)
-        return res.send("Error")
+        return res.status(400).send("Error")
     }
 }
 
@@ -94,7 +94,7 @@ TutorController.removeStudent = async(req, res)=>{
         return res.send(result)
     }catch(e){
         console.log(e)
-        return res.send("Error")
+        return res.status(400).send("Error")
     }
 }
 
@@ -106,7 +106,7 @@ TutorController.removeClass = async(req, res)=>{
         return res.send(result)
     }catch(e){
         console.log(e)
-        return res.send("Error")
+        return res.status(400).send("Error")
     }
 }
 

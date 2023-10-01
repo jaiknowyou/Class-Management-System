@@ -32,4 +32,4 @@ Step 2: MySQL Table Creation
 Step 3: Corrections and Debugging
 Step 4: PostMan API Collections = Day 2
 Step 5: Commenting if Required 
-Step 6: s3 bucket setup and Graphql setup (Later/Optional) = Day 3
+Step 6: s3 bucket setup and Hosting (Later/Optional) = Day 3

@@ -8,7 +8,7 @@ StudentController.viewClasses = async(req, res)=>{
         return res.send(classes)
     }catch(e){
         console.log(e)
-        return res.send("Request Failed.")
+        return res.status(400).send("Request Failed.")
     }
 }
 
@@ -18,7 +18,7 @@ StudentController.viewFiles = async(req, res)=>{
         return res.send(files)
     }catch(e){
         console.log(e)
-        return res.send("Request Failed.")
+        return res.status(400).send("Request Failed.")
     }
 }
 

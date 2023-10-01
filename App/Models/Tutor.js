@@ -11,7 +11,7 @@ class Tutor{
         try{
             // If class info (classCode) was already in DB, It's updated, else new entry is created.
             await executePromisified(`insert into classes (name, description, classCode, createdBy) values("${name}", "${description}", "${classCode}", ${this.id})
-                                        on duplicate key update active = 1, description = ${description}, name = ${name}`)
+                                        on duplicate key update active = 1, description = "${description}", name = "${name}", createdBy = ${this.id}`)
             return "Successfully Added."
         }catch(e){
             console.log(e)
@@ -34,11 +34,14 @@ class Tutor{
 
     removeClass = async(classCode)=>{
         try{
-            await executePromisified(`update classes set active = 0 where classCode = "${classCode}"`)
+            let result = await executePromisified(`update classes set active = 0 where classCode = "${classCode}"`)
             // Class is removed, Students enrolled with the class need to be removed. 
             // removing student from class as well
-            await executePromisified(`update student_classes set active = 0 where classCode = "${classCode}"`)
-            return "Class Removed"
+            if(result.changedRows){
+                await executePromisified(`update student_classes set active = 0 where classCode = "${classCode}"`)
+                return "Class Removed"
+            }
+            return "Class Not Found"
         }catch(e){
             console.log(e)
             return "Error"
@@ -47,13 +50,18 @@ class Tutor{
     
     addStudents = async(students, classCode)=>{
         try{
+            let res = {}
             for(let student of students){
                 try{
-                    await executePromisified(`insert into student_classes (studentId, classCode) values(${student.id}, "${classCode}")
-                                                    on duplicate key update active = 1`)
-                    res[student.id] = `Enrolled in ${classCode}`
+                    // await executePromisified(`insert into student_classes (studentId, classCode) values(${student.id}, "${classCode}")
+                    //                                 on duplicate key update active = 1`)
+                    let result = await executePromisified(`replace into student_classes (studentId, classCode)
+                                            select ${student}, "${classCode}" where exists (select classCode from classes where createdBy = ${this.id} and classCode = "${classCode}")`)
+                    if(result.affectedRows) res[student] = `Enrolled in ${classCode}`
+                    else res[student] = `Validation Error`
                 }catch(e){
-                    res[student.id] = "Wrong student Id or Wrong classCode"
+                    console.log(e)
+                    res[student] = "Wrong student Id or Wrong classCode"
                 }  
             }
             return res
@@ -81,7 +89,7 @@ class Tutor{
                 console.log(result)
                 file = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${classCode+name}`
             }
-            await executePromisified(`insert into files (name, description, classCode, file, fileType, uploadedBy) values("${name}", "${description}", "${classCode}", ${file}, ${fileType}, ${this.id})`)
+            let response = await executePromisified(`insert into files (name, description, classCode, file, fileType, uploadedBy) values("${name}", "${description}", "${classCode}", ${file}, ${fileType}, ${this.id})`)
             return "Successfully Added"
         }catch(e){
             console.log(e)
