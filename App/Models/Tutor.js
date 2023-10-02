@@ -1,5 +1,5 @@
 let CommonService = require('./Common')
-require('dotenv')
+require('dotenv').config()
 
 class Tutor{
     constructor(id, name){
@@ -84,7 +84,7 @@ class Tutor{
     addFile = async(name, description, classCode, fileType, file = null)=>{
         try{
             let result
-            if(file) result = await CommonService.uploadToS3({name, classCode, file})
+            if(file && fileType != 4) result = await CommonService.uploadToS3(name, classCode, file)
             if(result) {
                 console.log(result)
                 file = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${classCode+name}`

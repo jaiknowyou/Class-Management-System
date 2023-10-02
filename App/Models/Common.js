@@ -1,6 +1,6 @@
 let CommonService = {}
 
-require('dotenv')
+require('dotenv').config()
 const S3 = require('aws-sdk/clients/s3')
 const fs = require('fs')
 
@@ -93,15 +93,15 @@ CommonService.viewFiles = async(classCode, filter)=>{
     })
 }
 
-CommonService.uploadToS3 = async(file)=>{
+CommonService.uploadToS3 = async(name, classCode, file)=>{
     return new Promise((resolve, reject)=>{
         try{
-            let fileStream = fs.createReadStream(file.file)
+            let fileStream = fs.createReadStream(file.path)
             return s3.upload({
                 Bucket: bucketName,
                 Body: fileStream,
-                Key: `${file.classCode+file.name}`,
-                ACL: 'public-read'
+                Key: `${classCode+name}`,
+                // ACL: 'public-read'
             }).promise()
         }catch(e){
             console.log(e)
