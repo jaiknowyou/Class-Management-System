@@ -75,15 +75,16 @@ CommonService.commonCheck = function (req, req_data, key = 'body') {
     return 0
 }
 
-CommonService.viewFiles = async(classCode, filter)=>{
+CommonService.viewFiles = async(classCode, filter, id = null)=>{
     return new Promise(async(resolve, reject)=>{
         try{
             let query = `select name, description, file, fileType from files
                         where classCode = '${classCode}' `
             if(filter){
                 if(filter.name) query += `and name = '${filter.name}' `
-                if(filter.type) query += `and fileType = '${filter.type}'`
+                if(filter.type) query += `and fileType = '${filter.type}' `
             }
+            if(id) query += `and createdBy = ${id}`
             let files = await executePromisified(query)
             return resolve(files)
         }catch(e){
@@ -97,12 +98,13 @@ CommonService.uploadToS3 = async(name, classCode, file)=>{
     return new Promise((resolve, reject)=>{
         try{
             let fileStream = fs.createReadStream(file.path)
-            return s3.upload({
+            s3.upload({
                 Bucket: bucketName,
                 Body: fileStream,
                 Key: `${classCode+name}`,
-                // ACL: 'public-read'
+                ACL: 'public-read'
             }).promise()
+            return resolve(true)
         }catch(e){
             console.log(e)
             reject(e)

@@ -33,8 +33,8 @@ AuthController.user = (userType)=> async(req, res, next)=>{
         let result = await executePromisified(`select * from Users where id = ${userId}`)
         let [{id, name, type}] = result
         if(userType != type) return res.send("Invalid User Id.")
-        if(type == 'teacher') req.user = new Tutor(id, name, userId)
-        else req.user = new Student(id, name, userId)
+        if(type == 'teacher') req.user = new Tutor(id, name)
+        else req.user = new Student(id, name)
         next()
     }catch(e){
         console.log(e)

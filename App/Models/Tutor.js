@@ -1,3 +1,4 @@
+const fs = require('fs')
 let CommonService = require('./Common')
 require('dotenv').config()
 
@@ -23,7 +24,7 @@ class Tutor{
             let set = `set `
             if(update.name) set += `name = ${update.name} `
             if(update.description) set += `description = ${update.description} `
-            if(update.classCode) set += `classCode = ${update.classCode}`
+            if(update.classCode) set += `classCode = ${update.classCode} `
             await executePromisified(`update classes ${set} where classCode = "${classCode}"`)
             return "Successfully Updated."
         }catch(e){
@@ -34,7 +35,7 @@ class Tutor{
 
     removeClass = async(classCode)=>{
         try{
-            let result = await executePromisified(`update classes set active = 0 where classCode = "${classCode}"`)
+            let result = await executePromisified(`update classes set active = 0 where classCode = "${classCode} and createdBy = ${this.id}"`)
             // Class is removed, Students enrolled with the class need to be removed. 
             // removing student from class as well
             if(result.changedRows){
@@ -73,8 +74,11 @@ class Tutor{
 
     removeStudent = async(student, classCode)=>{
         try{
-            await executePromisified(`update student_classes set active = 0 where classCode = "${classCode}" and studentId = ${student}`)
-            return "Successfully removed"
+            let result = await executePromisified(`select active from classes where classCode = '${classCode}' and createdBy = ${this.id}`)
+            if(result[0] && result[0].active){
+                await executePromisified(`update student_classes set active = 0 where classCode = "${classCode}" and studentId = ${student}`)
+                return "Successfully removed"
+            }else "Class Tutor can only remove Students."
         }catch(e){
             console.log(e)
             return "Please provide right student ID and classCode."
@@ -83,14 +87,23 @@ class Tutor{
 
     addFile = async(name, description, classCode, fileType, file = null)=>{
         try{
-            let result
-            if(file && fileType != 4) result = await CommonService.uploadToS3(name, classCode, file)
-            if(result) {
-                console.log(result)
-                file = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${classCode+name}`
-            }
-            let response = await executePromisified(`insert into files (name, description, classCode, file, fileType, uploadedBy) values("${name}", "${description}", "${classCode}", ${file}, ${fileType}, ${this.id})`)
-            return "Successfully Added"
+            let result = await executePromisified(`select active from classes where classCode = '${classCode}' and createdBy = ${this.id}`)
+            if(result[0] && result[0].active){
+                try{
+                    if(file && fileType != 4) result = await CommonService.uploadToS3(name, classCode, file)
+                    if(result == true) {
+                        console.log(result)
+                        fs.unlink(`${file.path}`, (err) => {console.log(err)});
+                        file = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_BUCKET_REGION}.amazonaws.com/${classCode+name}`
+                    }
+                    await executePromisified(`insert into files (name, description, classCode, file, fileType, uploadedBy) values("${name}", "${description}", "${classCode}", "${file}", ${fileType}, ${this.id})`)
+                    return "Successfully Added"
+                }catch(e){
+                    console.log(e)
+                    return "Cannot be uploaded. Check s3 settings."
+                }
+                
+            }else return "Class Tutor Can Only Add."
         }catch(e){
             console.log(e)
             return "Invalid data."
@@ -110,7 +123,7 @@ class Tutor{
 
     viewFiles = async(classCode, filter)=>{
         try{
-            let files = await CommonService.viewFiles(classCode, filter)
+            let files = await CommonService.viewFiles(classCode, filter, this.id)
             return files
         }catch(e){
             console.log(e)

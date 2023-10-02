@@ -3,7 +3,6 @@ var app = express()
 const routes = require('./App/Routes/routes')
 var multer = require('multer')
 var path = require('path')
-// var upload = multer({dest: 'uploads'})
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -15,11 +14,7 @@ var storage = multer.diskStorage({
     }
 })
   
-var upload = multer({storage: storage,
-    onFileUploadStart: function (file) {
-    console.log(file.originalname + ' is starting ...')
-    },
-});
+var upload = multer({storage: storage});
 
 require('./App/Config/db')
 

@@ -58,8 +58,8 @@ TutorController.addFile = async(req, res)=>{
             default:
                 return res.send("Invalid File type.")
         }
-        await req.user.addFile(req.body.name, req.body.description, req.body.classCode, fileType, req.file ? req.file: null)
-        return res.send("Successfully Added.")
+        let result = await req.user.addFile(req.body.name, req.body.description, req.body.classCode, fileType, req.file ? req.file: null)
+        return res.send(result)
     }catch(e){
         console.log(e)
         return res.status(400).send("Error")

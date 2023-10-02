@@ -21,7 +21,10 @@ class Student{
 
     viewFiles = async(classCode, filter = undefined)=>{
         try{
-            let files = await CommonService.viewFiles(classCode, filter)
+            let result = await executePromisified(`select active from student_classes where classCode = '${classCode}' and studentId = ${this.id}`)
+            let files
+            if(result && result[0] && result[0].active) files = await CommonService.viewFiles(classCode, filter)
+            else files = "Student Not enrolled in this Class."
             return files
         }catch(e){
             console.log(e)
